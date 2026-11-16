@@ -21,8 +21,9 @@ $(BUILD): tests $(DOCS_BUILD)
 	[ -f setup.py ] && python setup.py $(BUILD)
 
 # run tests
-tests: .PHONY
-	python -m unittest -v tests
+.PHONY: tests
+tests:
+    PYTHONPATH=src python3 -m pytest tests/
 
 # build docs
 $(DOCS_BUILD):
