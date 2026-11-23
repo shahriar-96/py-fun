@@ -2,6 +2,7 @@ import importlib.util
 import sys
 import types
 from pathlib import Path
+import pytest
 
 
 def _load_collection_class():
@@ -50,3 +51,19 @@ def test_collection_add_and_remove():
 
     col.remove("first")
     assert col.items() == ["second"]
+
+
+def test_collection_items_returns_copy():
+    Collection = _load_collection_class()
+    col = Collection()
+    col.add("alpha")
+    snapshot = col.items()
+    snapshot.append("beta")
+    assert col.items() == ["alpha"]
+
+
+def test_collection_remove_missing_raises():
+    Collection = _load_collection_class()
+    col = Collection()
+    with pytest.raises(ValueError):
+        col.remove("missing")
