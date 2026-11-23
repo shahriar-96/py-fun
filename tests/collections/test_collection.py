@@ -2,7 +2,6 @@ import importlib.util
 import sys
 import types
 from pathlib import Path
-import pytest
 
 
 def _load_collection_class():
@@ -35,35 +34,32 @@ def _load_collection_class():
     return col_mod.Collection
 
 
-def test_collection_initialization():
+def test_collection_init_size_and_contains():
     Collection = _load_collection_class()
-    col = Collection()
-    assert col is not None
-    assert col.items() == []
+    col = Collection(1, 2, 3)
+    assert col.size() == 3
+    assert len(col) == 3
+    assert col.contains(2) is True
+    assert col.contains(99) is False
 
 
-def test_collection_add_and_remove():
+def test_collection_add_and_as_set():
     Collection = _load_collection_class()
-    col = Collection()
-    col.add("first")
-    col.add("second")
-    assert col.items() == ["first", "second"]
-
-    col.remove("first")
-    assert col.items() == ["second"]
+    col = Collection(asSet=True).add(1).add(1).add(2)
+    assert col.size() == 2
+    assert col.contains(1) is True
 
 
-def test_collection_items_returns_copy():
+def test_collection_zip():
     Collection = _load_collection_class()
-    col = Collection()
-    col.add("alpha")
-    snapshot = col.items()
-    snapshot.append("beta")
-    assert col.items() == ["alpha"]
+    left = Collection("a", "b")
+    right = Collection(1, 2)
+    zipped = Collection.zip(left, right)
+    assert list(zipped) == [("a", 1), ("b", 2)]
 
 
-def test_collection_remove_missing_raises():
+def test_collection_pset_and_perm():
     Collection = _load_collection_class()
-    col = Collection()
-    with pytest.raises(ValueError):
-        col.remove("missing")
+    col = Collection(1, 2)
+    assert col.pset() == {frozenset(), frozenset({1}), frozenset({2}), frozenset({1, 2})}
+    assert col.perm() == [[1, 2], [2, 1]]
